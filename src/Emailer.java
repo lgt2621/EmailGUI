@@ -106,12 +106,9 @@ public class Emailer {
 
     public void send() throws MailerException {
 
-        try{
-            this.transport.sendMessage(this.message, this.message.getAllRecipients());
-        }catch(MessagingException e){
-            System.err.println(e.getMessage());
-            throw new MailerException("Issue has occurred sending the message");
-        }
+        EmailThread emailThread=new EmailThread(type, message, transport);
+        Thread thread=new Thread(emailThread);
+        thread.start();
     }
 
     /**
