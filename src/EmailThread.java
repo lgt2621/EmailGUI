@@ -4,6 +4,7 @@ import javax.mail.MessagingException;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import java.lang.reflect.Array;
+import java.util.Random;
 
 public class EmailThread implements Runnable {
 
@@ -20,29 +21,46 @@ public class EmailThread implements Runnable {
     @Override
     public void run() {
         try {
-            switch (type) {
+            String[] tokens=type.split(" ");
+            switch (tokens[0]) {
                 case "Single":
                     Address[] addrs = message.getAllRecipients();
                     message.setRecipients(Message.RecipientType.TO, null);
                     for (Address addr : addrs) {
                         message.addRecipient(Message.RecipientType.TO, addr);
                         Address[] addrArray = new Address[]{addr};
-                        transport.sendMessage(this.message, addrArray);
+                        synchronized (transport) {
+                            transport.sendMessage(this.message, addrArray);
+                        }
                         message.setRecipients(Message.RecipientType.TO, null);
                     }
                     break;
                 case "Group":
-                    transport.sendMessage(this.message, this.message.getAllRecipients());
+                    synchronized (transport) {
+                        transport.sendMessage(this.message, this.message.getAllRecipients());
+                    }
                     break;
                 case "Scheduled":
                     break;
                 case "Random":
+                    Random rando=new Random();
+                    int reps=Integer.parseInt(tokens[1]);
+                    for(int i=0; i<reps; i++){
+                        synchronized(transport) {
+                            transport.sendMessage(this.message, this.message.getAllRecipients());
+                        }
+                        int downTime=(rando.nextInt(50)*60000)+600000;
+                        Thread.sleep(downTime);
+                    }
+
                     break;
                 case "Spam":
                     break;
             }
         }catch(MessagingException me){
-            System.err.println("An error has occured");
+            System.err.println("An error has occurred\n"+me);
+        } catch (InterruptedException e) {
+            System.err.println("Sleep has been interrupted");
         }
     }
 }

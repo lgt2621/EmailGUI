@@ -1,8 +1,10 @@
 import javafx.application.Application;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -16,6 +18,7 @@ public class EmailClient extends Application{
     private Scene emailScreen;
     private Scene logOn;
     private Scene homePage;
+    private Scene repeatScreen;
     private Emailer emailer;
 //     private String to;
 //     private String from;
@@ -126,6 +129,9 @@ public class EmailClient extends Application{
         HBox buttons=new HBox();
         buttons.getChildren().addAll(send, cancle);
         buttons.setMaxWidth(Double.MAX_VALUE);
+        for(Node node: buttons.getChildren()){
+            buttons.setHgrow(node, Priority.ALWAYS);
+        }
 
         VBox holder=new VBox();
         holder.getChildren().addAll(to, contact, sub, subject, directions, messenger, buttons);
@@ -211,8 +217,7 @@ public class EmailClient extends Application{
         Button randomMessage=new Button("Random Email");
         randomMessage.setMinWidth(150);
         randomMessage.setOnAction(e->{
-            emailer.setType("Random");
-            stage.setScene(emailScreen);
+            stage.setScene(repeatScreen);
         });
 
         Button spam=new Button("Oh God Oh Fuck");
@@ -253,6 +258,48 @@ public class EmailClient extends Application{
         return new Scene(holder, 500, 500);
     }
 
+    public Scene buildRepeat(Stage stage){
+        Label instructions=new Label("How many times would you like the message to repeat");
+
+        TextField number=new TextField();
+        number.setMaxWidth(50);
+
+        Button next=new Button("Continue");
+        next.setOnAction(e->{
+            String input=number.getText();
+            try {
+                int repetitions = Integer.parseInt(input);
+                if(repetitions<=0){
+                    error(new MailerException("Please enter a positive number"));
+                }else{
+                    emailer.setType("Random "+repetitions);
+                    stage.setScene(emailScreen);
+                }
+            }catch(NumberFormatException nfe){
+                error(new MailerException("Didn't enter a number. Please be reasonable"));
+            }finally{
+                number.clear();
+            }
+        });
+
+        Button cancel=new Button("Cancel");
+        cancel.setOnAction(e->{
+            number.clear();
+            stage.setScene(homePage);
+        });
+
+        VBox holder=new VBox();
+        holder.getChildren().addAll(instructions, number, next, cancel);
+        holder.setAlignment(Pos.CENTER);
+        holder.setSpacing(5);
+
+        return new Scene(holder, 500, 500);
+    }
+
+    public void buildSchedule(Stage stage){
+        //
+    }
+
     /**
      * Psuedo constructor. Instantiates emailer and builds all the screens
      * @param stage(Stage) the program's window
@@ -262,6 +309,7 @@ public class EmailClient extends Application{
         this.emailScreen=buildEmailScreen(stage);
         this.homePage=buildHomePage(stage);
         this.logOn=buildLogOn(stage);
+        this.repeatScreen=buildRepeat(stage);
     }
 
     /**
