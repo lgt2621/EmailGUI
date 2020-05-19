@@ -10,12 +10,12 @@ public class EmailThread implements Runnable {
 
     private String type;
     private Message message;
-    private Transport transport;
+    private Emailer mailer;
 
-    public EmailThread(String type, Message message, Transport transport){
+    public EmailThread(String type, Message message, Emailer mailer){
         this.type=type;
         this.message=message;
-        this.transport=transport;
+        this.mailer=mailer;
     }
 
     @Override
@@ -29,15 +29,17 @@ public class EmailThread implements Runnable {
                     for (Address addr : addrs) {
                         message.addRecipient(Message.RecipientType.TO, addr);
                         Address[] addrArray = new Address[]{addr};
-                        synchronized (transport) {
-                            transport.sendMessage(this.message, addrArray);
+                        synchronized (mailer) {
+                            mailer.reconnect();
+                            mailer.getTransport().sendMessage(this.message, addrArray);
                         }
                         message.setRecipients(Message.RecipientType.TO, null);
                     }
                     break;
                 case "Group":
-                    synchronized (transport) {
-                        transport.sendMessage(this.message, this.message.getAllRecipients());
+                    synchronized (mailer) {
+                        mailer.reconnect();
+                        mailer.getTransport().sendMessage(this.message, this.message.getAllRecipients());
                     }
                     break;
                 case "Scheduled":
@@ -46,10 +48,12 @@ public class EmailThread implements Runnable {
                     Random rando=new Random();
                     int reps=Integer.parseInt(tokens[1]);
                     for(int i=0; i<reps; i++){
-                        synchronized(transport) {
-                            transport.sendMessage(this.message, this.message.getAllRecipients());
+                        synchronized(mailer) {
+                            mailer.reconnect();
+                            mailer.getTransport().sendMessage(this.message, this.message.getAllRecipients());
                         }
                         int downTime=(rando.nextInt(50)*60000)+600000;
+                        System.out.println(downTime);
                         Thread.sleep(downTime);
                     }
 
@@ -59,6 +63,7 @@ public class EmailThread implements Runnable {
             }
         }catch(MessagingException me){
             System.err.println("An error has occurred\n"+me);
+
         } catch (InterruptedException e) {
             System.err.println("Sleep has been interrupted");
         }

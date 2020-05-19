@@ -18,6 +18,8 @@ public class Emailer {
     private MimeMessage message;
     private Transport transport;
     private String type;
+    private String password;
+    private String username;
 
     /**
      * Constructor
@@ -29,7 +31,11 @@ public class Emailer {
         this.properties.put("mail.smtp.auth", "true");
         this.properties.put("mail.smtp.starttls.enable", "true");
         this.session=Session.getDefaultInstance(this.properties);
-        this.message=new MimeMessage(this.session);
+        this.message=newMessage();
+    }
+
+    public MimeMessage newMessage(){
+        return new MimeMessage(this.session);
     }
 
     /**
@@ -43,6 +49,8 @@ public class Emailer {
         try {
             this.transport=this.session.getTransport("smtp");
             this.transport.connect("smtp.gmail.com", from, password);
+            this.username=from;
+            this.password=password;
 
         } catch (MessagingException e) {
             System.err.println(e.getMessage());
@@ -50,6 +58,25 @@ public class Emailer {
         }
 
     }
+
+    public void reconnect() {
+        try {
+            if(!transport.isConnected()) {
+                transport.connect("smtp.gmail.com", username, password);
+            }
+        }catch (MessagingException e){
+            System.err.println(e.getMessage());
+        }
+    }
+
+    public boolean status(){
+        return this.transport.isConnected();
+    }
+
+    public Transport getTransport(){
+        return this.transport;
+    }
+
 
     /**
      * Sets the type of email being sent
@@ -106,9 +133,10 @@ public class Emailer {
 
     public void send() throws MailerException {
 
-        EmailThread emailThread=new EmailThread(type, message, transport);
+        EmailThread emailThread=new EmailThread(type, message, this);
         Thread thread=new Thread(emailThread);
         thread.start();
+        this.message=newMessage();
     }
 
     /**
@@ -122,13 +150,5 @@ public class Emailer {
             System.err.println(e.getMessage());
             throw new MailerException("Problem logging out...Guess you can't leave");
         }
-    }
-
-    /**
-     * checks if the connection is still open
-     * @return true if open false if not
-     */
-    public boolean connected(){
-        return this.transport.isConnected();
     }
 }
