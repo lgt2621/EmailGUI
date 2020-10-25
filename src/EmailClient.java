@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -8,6 +9,13 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Callback;
+
+import javax.mail.internet.InternetAddress;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 
 /**
  * Purpose: The GUI for the email client
@@ -20,6 +28,7 @@ public class EmailClient extends Application{
     private Scene homePage;
     private Scene repeatScreen;
     private Emailer emailer;
+    private Scene scheduleScreen;
 //     private String to;
 //     private String from;
 //     private String password;
@@ -211,7 +220,7 @@ public class EmailClient extends Application{
         scheduledMessage.setMinWidth(150);
         scheduledMessage.setOnAction(e->{
             emailer.setType("Scheduled");
-            stage.setScene(emailScreen);
+            stage.setScene(scheduleScreen);
         });
 
         Button randomMessage=new Button("Random Email");
@@ -296,8 +305,72 @@ public class EmailClient extends Application{
         return new Scene(holder, 500, 500);
     }
 
-    public void buildSchedule(Stage stage){
-        //
+    public Scene buildSchedule(Stage stage){
+
+        DatePicker datePicker=new DatePicker();
+        Callback<DatePicker, DateCell> dayCellFactory =new Callback<DatePicker, DateCell>() {
+            @Override
+            public DateCell call(DatePicker datePicker) {
+                return new DateCell(){
+                    @Override
+                    public void updateItem(LocalDate item, boolean empty){
+                        super.updateItem(item, empty);
+                        if(item.compareTo(LocalDate.now())<0){
+                            setDisable(true);
+                        }
+                    }
+                };
+            }
+        };
+        datePicker.setDayCellFactory(dayCellFactory);
+
+        TextField hours = new TextField();
+        Label hDirections = new Label("Hours:");
+        TextField minutes = new TextField();
+        Label mDirections = new Label("Minutes:");
+        ChoiceBox amPm = new ChoiceBox(FXCollections.observableArrayList("Am", "Pm"));
+        Button next = new Button("Next");
+        next.setOnAction(e->{
+            LocalDate date = datePicker.getValue();
+            long waitTime = calculateWaitTime(date, Integer.parseInt(hours.getText()),
+                    Integer.parseInt(minutes.getText()),
+                    amPm.getValue().equals("Pm"));
+
+            emailer.setType("Scheduled " + waitTime);
+            stage.setScene(emailScreen);
+
+            hours.clear();
+            minutes.clear();
+        });
+
+        HBox hour=new HBox();
+        hour.getChildren().addAll(hDirections, hours);
+        HBox minute=new HBox();
+        minute.getChildren().addAll(mDirections, minutes);
+        VBox holder=new VBox();
+        holder.getChildren().addAll(datePicker, hour, minute, amPm, next);
+        return new Scene(holder, 500, 500);
+
+
+        //Date date=datePicker.getValue();
+    }
+
+    private long calculateWaitTime(LocalDate date, int hours, int minutes, boolean afternoon){
+        long sendTime = date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        System.out.println(sendTime);
+        if(afternoon){
+            sendTime +=((hours + 12) * 3600000) + (minutes *60000);
+        }else{
+            sendTime += (hours * 3600000) + (minutes * 60000);
+        }
+
+        long waitTime = sendTime - System.currentTimeMillis();
+        System.out.println(sendTime);
+        System.out.println(System.currentTimeMillis());
+        if(waitTime <0){
+          //TODO error case
+        }
+        return waitTime;
     }
 
     /**
@@ -310,6 +383,7 @@ public class EmailClient extends Application{
         this.homePage=buildHomePage(stage);
         this.logOn=buildLogOn(stage);
         this.repeatScreen=buildRepeat(stage);
+        this.scheduleScreen=buildSchedule(stage);
     }
 
     /**

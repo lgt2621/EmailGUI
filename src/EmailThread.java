@@ -1,9 +1,6 @@
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import java.lang.reflect.Array;
 import java.util.Random;
 
 public class EmailThread implements Runnable {
@@ -43,7 +40,14 @@ public class EmailThread implements Runnable {
                     }
                     break;
                 case "Scheduled":
+                    System.out.println(tokens[1]);
+                    Thread.sleep(Integer.parseInt(tokens[1]));
+                    synchronized(mailer) {
+                        mailer.reconnect();
+                        mailer.getTransport().sendMessage(this.message, this.message.getAllRecipients());
+                    }
                     break;
+
                 case "Random":
                     Random rando=new Random();
                     int reps=Integer.parseInt(tokens[1]);
