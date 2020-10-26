@@ -10,9 +10,9 @@ public class EmailThread implements Runnable {
     private Emailer mailer;
 
     public EmailThread(String type, Message message, Emailer mailer){
-        this.type=type;
-        this.message=message;
-        this.mailer=mailer;
+        this.type = type;
+        this.message = message;
+        this.mailer = mailer;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class EmailThread implements Runnable {
                     break;
 
                 case "Random":
-                    Random rando=new Random();
+                    Random rando = new Random();
                     int reps=Integer.parseInt(tokens[1]);
                     for(int i=0; i<reps; i++){
                         synchronized(mailer) {

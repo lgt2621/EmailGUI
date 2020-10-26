@@ -26,12 +26,12 @@ public class Emailer {
      * Sets up the basic network connections for accessing Gmail's servers
      */
     public Emailer(){
-        this.properties=System.getProperties();
+        this.properties = System.getProperties();
         this.properties.put("mail.smtp.port", "587");
         this.properties.put("mail.smtp.auth", "true");
         this.properties.put("mail.smtp.starttls.enable", "true");
-        this.session=Session.getDefaultInstance(this.properties);
-        this.message=newMessage();
+        this.session = Session.getDefaultInstance(this.properties);
+        this.message = newMessage();
     }
 
     public MimeMessage newMessage(){
@@ -47,10 +47,10 @@ public class Emailer {
     public void connect(String from, String password)throws MailerException{
 
         try {
-            this.transport=this.session.getTransport("smtp");
+            this.transport = this.session.getTransport("smtp");
             this.transport.connect("smtp.gmail.com", from, password);
-            this.username=from;
-            this.password=password;
+            this.username = from;
+            this.password = password;
 
         } catch (MessagingException e) {
             System.err.println(e.getMessage());
@@ -83,7 +83,7 @@ public class Emailer {
      * @param type(String) type of email and options
      */
     public void setType(String type){
-        this.type=type;
+        this.type = type;
     }
 
     /**
@@ -92,7 +92,7 @@ public class Emailer {
      * @throws MailerException
      */
     public void setTo(String to) throws MailerException {
-        String[] address=to.split(" ");
+        String[] address = to.split(" ");
         try {
             for(String addr:address) {
                 this.message.addRecipients(Message.RecipientType.TO, addr);
@@ -133,10 +133,10 @@ public class Emailer {
 
     public void send() throws MailerException {
 
-        EmailThread emailThread=new EmailThread(type, message, this);
-        Thread thread=new Thread(emailThread);
+        EmailThread emailThread = new EmailThread(type, message, this);
+        Thread thread = new Thread(emailThread);
         thread.start();
-        this.message=newMessage();
+        this.message = newMessage();
     }
 
     /**

@@ -11,11 +11,8 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-import javax.mail.internet.InternetAddress;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
 
 /**
  * Purpose: The GUI for the email client
@@ -38,7 +35,7 @@ public class EmailClient extends Application{
 
     @Override
     public void start(Stage stage){
-        intialize(stage);
+        initialize(stage);
         stage.setScene(logOn);
         stage.show();
 //        Emailer email=new Emailer();
@@ -88,27 +85,27 @@ public class EmailClient extends Application{
      */
     private Scene buildEmailScreen(Stage stage){
 
-        Label to=new Label("To: (If multiple recipients separate with commas)");
+        Label to = new Label("To: (If multiple recipients separate with commas)");
         to.setMaxWidth(Double.MAX_VALUE);
         to.setAlignment(Pos.CENTER_LEFT);
 
-        Label sub=new Label("Subject:");
+        Label sub = new Label("Subject:");
         sub.setMaxWidth(Double.MAX_VALUE);
         sub.setAlignment(Pos.CENTER_LEFT);
 
-        Label directions=new Label("Please enter your message");
+        Label directions = new Label("Please enter your message");
         directions.setMaxWidth(Double.MAX_VALUE);
         directions.setAlignment(Pos.CENTER_LEFT);
 
-        TextField contact=new TextField();
+        TextField contact = new TextField();
         contact.setPromptText("To");
 
-        TextField subject=new TextField();
+        TextField subject = new TextField();
         subject.setPromptText("Subject");
 
-        TextArea messenger=new TextArea();
+        TextArea messenger = new TextArea();
 
-        Button send=new Button("Send");
+        Button send = new Button("Send");
         send.setMaxWidth(Double.MAX_VALUE);
         send.setOnAction(e->{
             try {
@@ -126,7 +123,7 @@ public class EmailClient extends Application{
             }
         });
 
-        Button cancle=new Button("Cancel");
+        Button cancle = new Button("Cancel");
         cancle.setMaxWidth(Double.MAX_VALUE);
         cancle.setOnAction(e->{
             contact.clear();
@@ -135,7 +132,7 @@ public class EmailClient extends Application{
             stage.setScene(homePage);
         });
 
-        HBox buttons=new HBox();
+        HBox buttons = new HBox();
         buttons.getChildren().addAll(send, cancle);
         buttons.setMaxWidth(Double.MAX_VALUE);
         for(Node node: buttons.getChildren()){
@@ -145,7 +142,7 @@ public class EmailClient extends Application{
         VBox holder=new VBox();
         holder.getChildren().addAll(to, contact, sub, subject, directions, messenger, buttons);
         holder.setAlignment(Pos.CENTER);
-        Scene emailScreen=new Scene(holder, 500, 500);
+        Scene emailScreen = new Scene(holder, 500, 500);
         return emailScreen;
     }
 
@@ -156,21 +153,21 @@ public class EmailClient extends Application{
      */
     private Scene buildLogOn(Stage stage){
 
-        Label username=new Label("Username: (up to @)");
+        Label username = new Label("Username: (up to @)");
         username.setMaxWidth(300);
 
-        TextField from=new TextField();
+        TextField from = new TextField();
         from.setPromptText("Your Email");
         from.setMaxWidth(300);
 
-        Label pass=new Label("Password:");
+        Label pass = new Label("Password:");
         pass.setMaxWidth(300);
 
-        PasswordField password=new PasswordField();
+        PasswordField password = new PasswordField();
         password.setPromptText("Password");
         password.setMaxWidth(300);
 
-        Button logIn=new Button("Log In");
+        Button logIn = new Button("Log In");
         logIn.setOnAction(e-> {
             try {
                 emailer.connect(from.getText(), password.getText());
@@ -183,12 +180,12 @@ public class EmailClient extends Application{
             }
         });
 
-        VBox holder=new VBox();
+        VBox holder = new VBox();
         holder.getChildren().addAll(username, from, pass, password, logIn);
         holder.setAlignment(Pos.CENTER);
         holder.setSpacing(10);
-        Scene authenication=new Scene(holder,500, 500);
-        return authenication;
+        Scene authentication = new Scene(holder,500, 500);
+        return authentication;
     }
 
     /**
@@ -198,45 +195,45 @@ public class EmailClient extends Application{
      */
     private Scene buildHomePage(Stage stage){
 
-        Label title=new Label("A simple email client");
+        Label title = new Label("A simple email client");
         title.setFont(new Font("Arial", 25));
-        Label instructions=new Label("Please select the type of message you would like to send");
+        Label instructions = new Label("Please select the type of message you would like to send");
 
-        Button singleMessage=new Button("Email");
+        Button singleMessage = new Button("Email");
         singleMessage.setMinWidth(150);
         singleMessage.setOnAction(e->{
             emailer.setType("Single");
             stage.setScene(emailScreen);
         });
 
-        Button groupMessage=new Button(" Group Email");
+        Button groupMessage = new Button(" Group Email");
         groupMessage.setMinWidth(150);
         groupMessage.setOnAction(e->{
             emailer.setType("Group");
             stage.setScene(emailScreen);
         });
 
-        Button scheduledMessage=new Button("Schedule Email");
+        Button scheduledMessage = new Button("Schedule Email");
         scheduledMessage.setMinWidth(150);
         scheduledMessage.setOnAction(e->{
             emailer.setType("Scheduled");
             stage.setScene(scheduleScreen);
         });
 
-        Button randomMessage=new Button("Random Email");
+        Button randomMessage = new Button("Random Email");
         randomMessage.setMinWidth(150);
         randomMessage.setOnAction(e->{
             stage.setScene(repeatScreen);
         });
 
-        Button spam=new Button("Oh God Oh Fuck");
+        Button spam = new Button("Oh God Oh Fuck");
         spam.setMaxWidth(310);
         spam.setOnAction(e->{
             emailer.setType("Spam");
             stage.setScene(emailScreen);
         });
 
-        Button logOff=new Button("Log Out");
+        Button logOff = new Button("Log Out");
         logOff.setMaxWidth(310);
         logOff.setOnAction(e->{
             try {
@@ -247,19 +244,19 @@ public class EmailClient extends Application{
             }
         });
 
-        HBox top =new HBox();
+        HBox top = new HBox();
         top.getChildren().addAll(singleMessage, groupMessage);
         top.setMaxWidth(Double.MAX_VALUE);
         top.setAlignment(Pos.CENTER);
         top.setSpacing(10);
 
-        HBox bottom=new HBox();
+        HBox bottom = new HBox();
         bottom.getChildren().addAll(scheduledMessage, randomMessage);
         bottom.setMaxWidth(Double.MAX_VALUE);
         bottom.setAlignment(Pos.CENTER);
         bottom.setSpacing(10);
 
-        VBox holder =new VBox();
+        VBox holder = new VBox();
         holder.getChildren().addAll(title, instructions, top, bottom, spam, logOff);
         holder.setAlignment(Pos.CENTER);
         holder.setMaxWidth(Double.MAX_VALUE);
@@ -268,20 +265,20 @@ public class EmailClient extends Application{
     }
 
     public Scene buildRepeat(Stage stage){
-        Label instructions=new Label("How many times would you like the message to repeat");
+        Label instructions = new Label("How many times would you like the message to repeat");
 
-        TextField number=new TextField();
+        TextField number = new TextField();
         number.setMaxWidth(50);
 
-        Button next=new Button("Continue");
+        Button next = new Button("Continue");
         next.setOnAction(e->{
-            String input=number.getText();
+            String input = number.getText();
             try {
                 int repetitions = Integer.parseInt(input);
-                if(repetitions<=0){
+                if(repetitions <= 0){
                     error(new MailerException("Please enter a positive number"));
                 }else{
-                    emailer.setType("Random "+repetitions);
+                    emailer.setType("Random " + repetitions);
                     stage.setScene(emailScreen);
                 }
             }catch(NumberFormatException nfe){
@@ -291,13 +288,13 @@ public class EmailClient extends Application{
             }
         });
 
-        Button cancel=new Button("Cancel");
+        Button cancel = new Button("Cancel");
         cancel.setOnAction(e->{
             number.clear();
             stage.setScene(homePage);
         });
 
-        VBox holder=new VBox();
+        VBox holder = new VBox();
         holder.getChildren().addAll(instructions, number, next, cancel);
         holder.setAlignment(Pos.CENTER);
         holder.setSpacing(5);
@@ -307,8 +304,8 @@ public class EmailClient extends Application{
 
     public Scene buildSchedule(Stage stage){
 
-        DatePicker datePicker=new DatePicker();
-        Callback<DatePicker, DateCell> dayCellFactory =new Callback<DatePicker, DateCell>() {
+        DatePicker datePicker = new DatePicker();
+        Callback<DatePicker, DateCell> dayCellFactory = new Callback<>() {
             @Override
             public DateCell call(DatePicker datePicker) {
                 return new DateCell(){
@@ -343,11 +340,11 @@ public class EmailClient extends Application{
             minutes.clear();
         });
 
-        HBox hour=new HBox();
+        HBox hour = new HBox();
         hour.getChildren().addAll(hDirections, hours);
-        HBox minute=new HBox();
+        HBox minute = new HBox();
         minute.getChildren().addAll(mDirections, minutes);
-        VBox holder=new VBox();
+        VBox holder = new VBox();
         holder.getChildren().addAll(datePicker, hour, minute, amPm, next);
         return new Scene(holder, 500, 500);
 
@@ -377,13 +374,13 @@ public class EmailClient extends Application{
      * Psuedo constructor. Instantiates emailer and builds all the screens
      * @param stage(Stage) the program's window
      */
-    public void intialize(Stage stage){
-        this.emailer=new Emailer();
-        this.emailScreen=buildEmailScreen(stage);
-        this.homePage=buildHomePage(stage);
-        this.logOn=buildLogOn(stage);
-        this.repeatScreen=buildRepeat(stage);
-        this.scheduleScreen=buildSchedule(stage);
+    public void initialize(Stage stage){
+        this.emailer = new Emailer();
+        this.emailScreen = buildEmailScreen(stage);
+        this.homePage = buildHomePage(stage);
+        this.logOn = buildLogOn(stage);
+        this.repeatScreen = buildRepeat(stage);
+        this.scheduleScreen = buildSchedule(stage);
     }
 
     /**
@@ -391,11 +388,11 @@ public class EmailClient extends Application{
      * @param except(MailerException) the exception that will be reported
      */
     private void error(Exception except){
-        Stage errorWindow=new Stage();
-        Label errorMessage=new Label(except.getMessage());
+        Stage errorWindow = new Stage();
+        Label errorMessage = new Label(except.getMessage());
         errorMessage.setAlignment(Pos.CENTER);
         errorMessage.setWrapText(true);
-        Scene errorScreen=new Scene(errorMessage, 300, 50);
+        Scene errorScreen = new Scene(errorMessage, 300, 50);
         errorWindow.setScene(errorScreen);
         errorWindow.show();
     }
